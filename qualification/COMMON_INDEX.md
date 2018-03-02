@@ -64,7 +64,7 @@
 
     >wiki: The indicator is designed for use on a monthly time scale. It is the sum of a 14-month rate of change and 11-month rate of change, smoothed by a 10-period weighted moving average.  https://en.wikipedia.org/wiki/Coppock_curve
 
-    属于中期买入指标，当市场长期处于上涨态势，利用该指标刨除短期下跌变动，说明整体处于上涨阶段，当指标大于0的时候，说明已经处于涨的状态
+    属于中期买入指标，当市场长期处于上涨态势，利用该指标刨除短期下跌变动，说明整体处于上涨阶段，当指标大于0的时候，说明已经处于涨的状态，非AD指标
 
 ### MCL(McClellan Oscillator)
 
