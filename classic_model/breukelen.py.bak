@@ -8,21 +8,20 @@ import pandas as pd
 import numpy as np
 
 from WindPy import *
-from functools import reduce
 w.start()
 
 def breukelen(classification , p , b ):
     def calWD(matrix): 
-        return reduce(lambda x,y : x + y , [x[0] * x[1] for x in matrix] , 0)
+        return reduce(lambda x,y : x + y , map(lambda x : x[0] * x[1]  , matrix) , 0)
     def calWR(matrix) : 
-        return reduce(lambda x,y : x + y , [x[0] * x[1] * x[2] for x in matrix] , 0)
+        return reduce(lambda x,y : x + y , map(lambda x : x[0] * x[1] * x[2], matrix) , 0)
     Dp = calWD(p)
     Db = calWD(b)
     Rp = calWR(p)
     Rb = calWR(b)    
-    Ds = [(Dp / Db - 1) * x[0] * x[1] * x[2] for x in b]
-    Ws = list(map(lambda x ,y : (x[0] * x[1] - (Dp / Db) * y[0] * y[1])*(y[2] - Rb) , p , b))
-    Ps = list(map(lambda x, y : (x[0] * x[1]) * (x[2] - y[2]) , p , b))
+    Ds = map(lambda x : (Dp / Db - 1) * x[0] * x[1] * x[2] , b )
+    Ws = map(lambda x ,y : (x[0] * x[1] - (Dp / Db) * y[0] * y[1])*(y[2] - Rb) , p , b)
+    Ps = map(lambda x, y : (x[0] * x[1]) * (x[2] - y[2]) , p , b)
     return pd.DataFrame([Ds , Ws , Ps] ,index = ['duration' , 'allocation' , 'select'] , columns = classification ).T
 
 def AdditionData(symbol , tradedate):
@@ -87,7 +86,7 @@ def governmentLoanBase(tradedate):
     #df.rename(columns = {'BONDSETTLE_TRANSACTION':'amount'}, inplace = True)
     df['amount'] = pd.Series([1.] * df['CODES'].size) 
     df = df.dropna()   
-    print(df)
+    print df
     return ProductTimeMatrix(df)
      
     
@@ -120,13 +119,13 @@ if __name__ == "__main__":
     
     productData = preTRMSPosition(analysisdate)
     base = governmentLoanBase(analysisdate)
-    print('base:')
-    print(base)
-    print('end')
+    print 'base:'
+    print base
+    print 'end'
     for key in productData:
-        print("\n" , key) 
+        print "\n" , key 
         rst = breukelen(c,productData[key],base)
-        print(rst)
-        print(rst['duration'].sum(),rst['allocation'].sum() , rst['select'].sum())
-        print(np.sum([ rst['duration'].sum(),rst['allocation'].sum() , rst['select'].sum()]))
-    print(base)
+        print rst
+        print rst['duration'].sum(),rst['allocation'].sum() , rst['select'].sum()
+        print np.sum([ rst['duration'].sum(),rst['allocation'].sum() , rst['select'].sum()])
+    print base

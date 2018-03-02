@@ -62,7 +62,7 @@ class FamaFrenchFactors():
         
         getEr = lambda x : np.mean(x[0:len(x)/3]) - np.mean(x[len(x)/3*2:])
         
-        result = list(map(getEr , [SMB_ASC,HML_DES,RMW_DES,CMA_ASC]))    
+        result = map(getEr , [SMB_ASC,HML_DES,RMW_DES,CMA_ASC])    
         return (rmMrf , result[0], result[1], result[2], result[3], rf)
    
     def GenerateThreeFactors(self ,rf , data ):
@@ -95,6 +95,6 @@ class FamaFrenchFactors():
         
         getEr = lambda x : np.mean(x[0:len(x)/3]) - np.mean(x[len(x)/3*2:])
         
-        result = list(map(getEr , [SMB_ASC,HML_DES]))    
+        result = map(getEr , [SMB_ASC,HML_DES])    
         return (rmMrf , result[0], result[1], rf)
     

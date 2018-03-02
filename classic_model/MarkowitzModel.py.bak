@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from __future__ import division
 
 """
 Created on Mon Sep 04 10:07:30 2017
@@ -23,7 +23,7 @@ class MarkowitzModel(object):
         self.__model = ConcreteModel('Markowitz MODEL')
         model = self.__model
         if not Ra:
-            Ra = list([np.mean(x) for x in R])    
+            Ra = list(map(lambda x : np.mean(x) , R))    
         n = len(Ra)
         #Create the inc with length n
         model.inc = Set(initialize=list(range(n)))
@@ -65,7 +65,7 @@ class MarkowitzModel(object):
             sf = SolverFactory('ipopt.exe' , fee= True)
             sf.solve(self.__model)    
         except Exception as e:
-            print('[ERROR]' , e)
+            print '[ERROR]' , e
             return False , e , self.__Ra , 0 ,0 
         weight = [self.__model.w[item].value for item in self.__model.w] 
         weight = np.array(weight)
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     hs300 = '1000002396000000'
     qA='a001010100000000'
     res0 = w.wset("sectorconstituent","date=2006-01-01;sectorid={}".format(qA))
-    print(res0)
+    print res0
     codes = ",".join( res0.Data[1])
     res1 = w.wsd(codes, "pct_chg", "ED-1M", "2006-01-01", "Period=W;Fill=Previous;PriceAdj=B")
     #R = res1.Data
@@ -91,12 +91,12 @@ if __name__ == '__main__':
     model =  MarkowitzModel(df.values,Er = 0.3)
     flag , w ,ra , er , risk  = model.solve()
     if flag:
-        print("Er:{} , Risk:{} , Er/Risk:{}".format( er , risk , er/risk))
+        print "Er:{} , Risk:{} , Er/Risk:{}".format( er , risk , er/risk)
         weight = pd.Series(  w  , index = res1.Codes )
         ra = pd.Series(ra , index = res1.Codes)
         result = pd.DataFrame()
         result.insert(0 , 'weight' , weight)
         result.insert(1 , 'ra' , ra)
         result = result.sort_values('weight', ascending = False)
-        print(result)
+        print result
 
