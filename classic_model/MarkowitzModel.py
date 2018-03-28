@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-
 """
 Created on Mon Sep 04 10:07:30 2017
 
 Run Enviroment: 
     python packages : numpy , pyomo  ( just pip install )
     extra supports : ipopt (need ipopt source and extention source to compliled)
+    install guide: https://www.coin-or.org/Ipopt/documentation/node10.html
+
 @author: kanon
 """
 
@@ -18,6 +19,7 @@ class MarkowitzModel(object):
     """
     A model of Markowitz 
     Get the best weight vector of securities with a expected return
+    if expected return Ra is not given, will use mean to replace
     """
     def __init__(self,R,Ra=[] ,Er = 0.0 ):
         self.__model = ConcreteModel('Markowitz MODEL')
@@ -62,10 +64,10 @@ class MarkowitzModel(object):
     def solve(self):
         try:
             from pyomo.opt import SolverFactory
-            sf = SolverFactory('ipopt.exe' , fee= True)
+            sf = SolverFactory('ipopt' , fee= True)
             sf.solve(self.__model)    
         except Exception as e:
-            print('[ERROR]' , e)
+            print(e)
             return False , e , self.__Ra , 0 ,0 
         weight = [self.__model.w[item].value for item in self.__model.w] 
         weight = np.array(weight)
@@ -74,29 +76,17 @@ class MarkowitzModel(object):
         return True , weight , self.__Ra , np.sum(weight * self.__Ra) , np.sum( np.dot(w,wt) * self.__covR )
             
         
-if __name__ == '__main__':
-    from WindPy import w
-    w.start()
-    zh50 = 'a00103010b000000'
-    hs300 = '1000002396000000'
-    qA='a001010100000000'
-    res0 = w.wset("sectorconstituent","date=2006-01-01;sectorid={}".format(qA))
-    print(res0)
-    codes = ",".join( res0.Data[1])
-    res1 = w.wsd(codes, "pct_chg", "ED-1M", "2006-01-01", "Period=W;Fill=Previous;PriceAdj=B")
-    #R = res1.Data
-    import pandas as pd
-    df = pd.DataFrame(res1.Data , index = res1.Codes , columns = res1.Times)
-    df = df.fillna(0)
-    model =  MarkowitzModel(df.values,Er = 0.3)
+def example():
+    values = [
+        [0.2 , 1.3 , 3 ,12 ,32. ,1.2 ,0.4],
+        [0.1 , 0.2 , 3 ,0  ,0.5 ,0.5 ,0.5]
+    ]
+
+    model =  MarkowitzModel(values,Er = 0.3)
     flag , w ,ra , er , risk  = model.solve()
     if flag:
         print("Er:{} , Risk:{} , Er/Risk:{}".format( er , risk , er/risk))
-        weight = pd.Series(  w  , index = res1.Codes )
-        ra = pd.Series(ra , index = res1.Codes)
-        result = pd.DataFrame()
-        result.insert(0 , 'weight' , weight)
-        result.insert(1 , 'ra' , ra)
-        result = result.sort_values('weight', ascending = False)
-        print(result)
+        print(ra)
+        print(w)
 
+example()
